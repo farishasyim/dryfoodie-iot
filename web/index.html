@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DryFoodie</title>
+    <link rel="stylesheet" href="public/css/bootstrap.min.css" />
+  </head>
+  <body class="d-flex align-items-center">
+    <div class="container container-fluid p-4 bg-primary text-light">
+      <h3>DryFoodie</h3>
+      <h6 class="font-weight-normal">
+        Perangkat pintar yang mampu mendeteksi jumlah makanan kering yang
+        tersisa di dalam storage. Data ini akan ditampilkan secara real-time
+        pada layar LCD dan juga dapat diakses melalui web client. Selain itu,
+        web client juga dapat digunakan untuk menjatuhkan makanan secara
+        otomatis, memastikan kucing Anda selalu memiliki makanan yang cukup.
+      </h6>
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <center>
+            <img
+              src="public/empty.png"
+              height="700px"
+              id="image_percentage"
+              alt=""
+            />
+          </center>
+        </div>
+        <div
+          class="col-md-6 row align-items-center justify-content-center pt-4"
+        >
+          <h1 id="percentage">0%</h1>
+        </div>
+      </div>
+      <br />
+      <div class="row">
+        <div class="col-md-12">
+          <h3>Pour Food</h3>
+          <hr class="border border-light" />
+          <div class="row">
+            <div class="col-md-4">
+              <button
+                class="btn btn-success font-weight-bold btn-block"
+                onclick="onPour('low')"
+              >
+                LOW
+              </button>
+            </div>
+            <div class="col-md-4">
+              <button
+                class="btn btn-warning font-weight-bold text-light btn-block"
+                onclick="onPour('med')"
+              >
+                MED
+              </button>
+            </div>
+            <div class="col-md-4">
+              <button
+                class="btn btn-danger font-weight-bold btn-block"
+                onclick="onPour('high')"
+              >
+                HIGH
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript" src="public/js/mqtt.min.js"></script>
+  <script type="text/javascript" src="public/js/jquery.slim.min.js"></script>
+  <script type="text/javascript" src="public/js/popper.min.js"></script>
+  <script type="text/javascript" src="public/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="public/js/mqtt_function.js"></script>
+</html>
