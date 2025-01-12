@@ -3,6 +3,8 @@
 // ---------------------------------------------------------------------------
 
 #include <NewPing.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h> 
 #include <ESP32Servo.h>
@@ -10,12 +12,15 @@
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 
-#define pinbutton 13
 #define TURN_TIME 175
-#define TRIGGER_PIN  5  // Arduino pin tied to trigger pin on the ultrasonic sensor.
-#define ECHO_PIN     18  // Arduino pin tied to echo pin on the ultrasonic sensor.
-#define MAX_DISTANCE 18 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
+#define TRIGGER_PIN  27  // Arduino pin tied to trigger pin on the ultrasonic sensor.
+#define ECHO_PIN     25  // Arduino pin tied to echo pin on the ultrasonic sensor.
+#define MAX_DISTANCE 200 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
 
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
+String formattedDate;
+String timeStamp;
 double maximum = 21;
 const char* ssid = "UNDEFINED";
 const char* password = "meng2003";
@@ -64,20 +69,10 @@ unsigned long lastMsg = 0;
 char msg[MSG_BUFFER_SIZE];
 
 void onPour(String pour = "") {
-  int pourDuration = 500;
+  int pourDuration = 1500;
   if (pour != "") {
     Serial.print("BUTTON => ");
-    Serial.println(digitalRead(pinbutton));
-    if (pour == "low") {
-      pourDuration = 400;
-    } else if (pour == "high") {
-      pourDuration = 600;
-    }
       myServo.write(0);
-      delay(pourDuration);
-      myServo.write(90);
-      delay(pourDuration);
-      myServo.write(180);
       delay(pourDuration);
       myServo.write(90);
   }
@@ -153,11 +148,12 @@ void setup() {
   setup_wifi();
   espClient.setCACert(root_ca);
   myServo.attach(16);
-  pinMode(pinbutton, INPUT_PULLUP);
   lcd.init();
   lcd.backlight();
   client.setServer(mqtt_server, 8883);
   client.setCallback(callback);
+  timeClient.begin();
+  timeClient.setTimeOffset(3600);
 }
 
 void loop() {
@@ -166,9 +162,20 @@ void loop() {
   }
   
   client.loop();
-  if (digitalRead(pinbutton) == 1) {
-    onPour("med");
+
+  while(!timeClient.update()) {
+    timeClient.forceUpdate();
   }
+
+  formattedDate = timeClient.getFormattedDate();
+  Serial.println(formattedDate);
+
+  int splitT = formattedDate.indexOf("T");
+
+  timeStamp = formattedDate.substring(splitT+1, formattedDate.length()-1);
+  Serial.print("HOUR: ");
+  Serial.println(timeStamp);
+
   lcd.setCursor(0,0);
   double current = sonar.ping() / 57.0;
   int percent = 100;
